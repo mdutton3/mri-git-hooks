@@ -74,7 +74,9 @@ DEST=/usr/local/bin
 
 # Install
 [ -d "$DEST" ] || $SUCMD mkdir -p "$DEST"
-$SUCMD cp "$SRC" "$DEST/git-hooks"
-$SUCMD chmod ugo+rx "$DEST/git-hooks"
-$SUCMD chmod go-w "$DEST/git-hooks"
+$SUCMD cp "$SRC" "$DEST/git-hooks" || fail "Could not copy file"
+$SUCMD chmod ugo+rx "$DEST/git-hooks" || fail "Could not set execute bit"
+$SUCMD chmod go-w "$DEST/git-hooks" || fail "Could not clear write bit"
 
+echo "Installed:"
+ls -al "$DEST/git-hooks"
