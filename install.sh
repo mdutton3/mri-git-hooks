@@ -61,7 +61,10 @@ fi
 
 if [ -n "$SUCMD" ]; then
 	echo "Using $SUCMD to access super-user"
-	$SUCMD true || fail "Could not gain SU privledges"
+	if ! $SUCMD true; then
+		echo "Could not gain SU privledges. Reverting to no super-user"
+		SUCMD=""
+	fi
 else
 	echo "No super-user command found. Assuming super-user permissions"
 fi
