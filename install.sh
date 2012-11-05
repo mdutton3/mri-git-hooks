@@ -34,6 +34,11 @@ function fail()
 	exit 1
 }
 
+function cmd_exists()
+{
+	which "$1" > /dev/null 2> /dev/null
+}
+
 # Operate out of the script dir
 cd "$( dirname "$0" )"
 
@@ -48,9 +53,9 @@ SRC="src/git-hooks/git-hooks"
 
 # Determine what su/sudo is installed
 SUCMD=
-if which sudo > /dev/null; then
+if cmd_exists sudo; then
 	SUCMD="sudo"
-elif which su > /dev/null; then
+elif cmd_exists su; then
 	SUCMD="su root -c"
 fi
 
