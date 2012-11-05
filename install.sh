@@ -28,6 +28,25 @@
 
 # This script installs git-hooks to /usr/local/bin
 
+function fail()
+{
+	echo "$@" 1>&2
+	exit 1
+}
+
+# Operate out of the script dir
+cd "$( dirname "$0" )"
+
+# Download
+mkdir src
+echo "Downloading git-hooks..."
+git clone https://github.com/mdutton3/git-hooks.git src/git-hooks || fail "Could not clone git-hooks"
+
+# Verify
+SRC="src/git-hooks/git-hooks"
+[ -f "$SRC" ] || fail "Could not find git-hooks script"
+
+# Determine what su/sudo is installed
 SUCMD=
 if which sudo > /dev/null; then
 	SUCMD="sudo"
@@ -35,17 +54,19 @@ elif which su > /dev/null; then
 	SUCMD="su root -c"
 fi
 
-[ -n "$SUCMD" ] && echo "Using $SUCMD to access super-user"
-[ -z "$SUCMD" ] && echo "No super-user command found. Assuming super-user permissions"
+if [ -n "$SUCMD" ]; then
+	echo "Using $SUCMD to access super-user"
+	$SUCMD true || fail "Could not gain SU privledges"
+else
+	echo "No super-user command found. Assuming super-user permissions"
+fi
 
 # Where to install
 DEST=/usr/local/bin
 
-# Get the path to the current script
-DIR="$( cd "$( dirname "$0" )" && pwd )"
-
-[ -d "/usr/local/bin" ] || $SUCMD mkdir -p "$DEST"
-$SUCMD cp "$DIR/git-hooks" "$DEST/git-hooks"
+# Install
+[ -d "$DEST" ] || $SUCMD mkdir -p "$DEST"
+$SUCMD cp "$SRC" "$DEST/git-hooks"
 $SUCMD chmod ugo+rx "$DEST/git-hooks"
 $SUCMD chmod go-w "$DEST/git-hooks"
 
