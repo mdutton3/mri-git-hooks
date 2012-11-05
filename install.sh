@@ -43,12 +43,17 @@ function cmd_exists()
 cd "$( dirname "$0" )"
 
 # Download
-SRC="src/git-hooks/git-hooks"
+SRCDIR="src/git-hooks"
+SRC="$SRCDIR/git-hooks"
 if [ ! -f "$SRC" ]; then
 	mkdir src
 	echo "Downloading git-hooks..."
 	git clone git://github.com/mdutton3/git-hooks.git src/git-hooks || fail "Could not clone git-hooks"
 	[ -f "$SRC" ] || fail "Could not find git-hooks script"
+elif [ -d "$SRCDIR/.git" ]; then
+	cd "$SRCDIR"
+	echo "Updating git-hooks clone:"
+	git pull --ff-only
 fi
 
 # Determine what su/sudo is installed
