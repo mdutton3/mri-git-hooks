@@ -42,19 +42,15 @@ function cmd_exists()
 # Operate out of the script dir
 cd "$( dirname "$0" )"
 
-# Download
-SRCDIR="src/git-hooks"
-SRC="$SRCDIR/git-hooks"
-if [ ! -f "$SRC" ]; then
-	mkdir src
-	echo "Downloading git-hooks..."
-	git clone git://github.com/mdutton3/git-hooks.git src/git-hooks || fail "Could not clone git-hooks"
-	[ -f "$SRC" ] || fail "Could not find git-hooks script"
-elif [ -d "$SRCDIR/.git" ]; then
-	cd "$SRCDIR"
-	echo "Updating git-hooks clone:"
-	git pull --ff-only
-fi
+# Blow away any previous download
+[ -d "src" ] && rm -f -r src
+
+# Download again
+SRC="src/git-hooks/git-hooks"
+mkdir src
+echo "Downloading git-hooks..."
+git clone git://github.com/mdutton3/git-hooks.git src/git-hooks || fail "Could not clone git-hooks"
+[ -f "$SRC" ] || fail "Could not find git-hooks script"
 
 # Determine what su/sudo is installed
 SUCMD=
@@ -85,3 +81,5 @@ $SUCMD chmod go-w "$DEST/git-hooks" || fail "Could not clear write bit"
 
 echo "Installed:"
 ls -al "$DEST/git-hooks"
+
+rm -f -r src || echo "Failed to remove src dir"
